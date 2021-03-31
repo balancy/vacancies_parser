@@ -8,10 +8,10 @@ API_URL = "https://api.hh.ru/vacancies"
 
 
 def extract_popular_programming_languages(number=8):
-    """
+    """Extract a list of popular programming languages.
 
-    :param number:
-    :return:
+    :param number: number of languages
+    :return: list of languages
     """
 
     url = "https://www.codingame.com/work/blog/hr-news-trends/" \
@@ -30,11 +30,11 @@ def extract_popular_programming_languages(number=8):
 
 
 def fetch_hh_page(job_title, page_number):
-    """
+    """Get parsed one HH page via API.
 
-    :param job_title:
-    :param page_number:
-    :return:
+    :param job_title: title of the job to search
+    :param page_number: number of page to parse
+    :return: parsed page
     """
 
     params = {
@@ -52,10 +52,10 @@ def fetch_hh_page(job_title, page_number):
 
 
 def predict_rub_salary(salary_fork):
-    """
+    """Predict salary in rubles given a salary fork.
 
-    :param salary_fork:
-    :return:
+    :param salary_fork: salary fork
+    :return: predicted salary
     """
 
     if not salary_fork.get("currency") != "RUB":
@@ -74,7 +74,12 @@ def predict_rub_salary(salary_fork):
     return None
 
 
-def extract_predicted_salaries(response_items):
+def calculate_predicted_salaries(response_items):
+    """Calculate predicted salaries from parsed items.
+
+    :param response_items: parsed items from API response
+    :return: list of calculated predicted salaries
+    """
 
     salaries_forks = [vacancy.get("salary") for vacancy in response_items]
     salaries = [predict_rub_salary(salary_fork)
@@ -83,7 +88,13 @@ def extract_predicted_salaries(response_items):
     return salaries
 
 
-def extract_predicted_salaries_from_pages(job_title, number_of_pages=30):
+def calculate_salaries_for_pages(job_title, number_of_pages=30):
+    """Calculate predicted salaries for all given pages.
+
+    :param job_title: job title
+    :param number_of_pages: number of pages to parse
+    :return: list of calculated salaries and total number of jobs found
+    """
 
     salaries = list()
     results_found = 0
@@ -103,13 +114,19 @@ def extract_predicted_salaries_from_pages(job_title, number_of_pages=30):
         response_items = parsed_response.get("items")
         if not response_items:
             break
-        salaries += extract_predicted_salaries(response_items)
+        salaries += calculate_predicted_salaries(response_items)
         time.sleep(3)
 
     return salaries, results_found
 
 
 def format_statistics(jobs_found, salaries):
+    """Represent some statistics in formatted form.
+
+    :param jobs_found: number of found jobs
+    :param salaries: list of salaries
+    :return: statistics in formatted form
+    """
 
     return {
         "vacancies_found": jobs_found,
@@ -123,7 +140,7 @@ if __name__ == "__main__":
     output = dict()
     for language in languages:
         salaries, jobs_found = \
-            extract_predicted_salaries_from_pages(f"Программист {language}", 3)
+            calculate_salaries_for_pages(f"Программист {language}", 3)
         output[language] = format_statistics(jobs_found, salaries)
 
     print(output)

@@ -13,6 +13,12 @@ API_URL = "https://api.superjob.ru/2.33/vacancies/"
 
 
 def get_response(api_key, keyword):
+    """Get HTTP response from SuperJob API, using keyword.
+
+    :param api_key: your API key
+    :param keyword: job to search. Example: Python
+    :return: HTTP response
+    """
 
     headers = {
         "X-Api-App-Id": api_key,
@@ -71,7 +77,11 @@ if __name__ == "__main__":
     statistics = dict()
     languages = extract_popular_programming_languages()
     for language in languages:
-        response = get_response(api_key, language)
+        try:
+            response = get_response(api_key, language)
+        except requests.HTTPError:
+            print("SuperJob API is unavailable. Try later.")
+            break
         statistics[language] = format_statistics(response)
 
-    show_pretty_statistics(statistics)
+    show_pretty_statistics(statistics, "SuperJob")

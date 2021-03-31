@@ -43,10 +43,11 @@ def extract_popular_programming_languages(number=8):
     return [language.text for language in extracted_languages][:number]
 
 
-def show_pretty_statistics(statistics):
+def show_pretty_statistics(statistics, site):
     """Prints statistics in pretty form.
 
     :param statistics: statistics dictionary
+    :param site: site statistics comes from
     :return: None
     """
 
@@ -59,6 +60,6 @@ def show_pretty_statistics(statistics):
             value.get("average_salary"),
         ])
 
-    title = "SuperJob Moscow"
+    title = f"{site} Moscow"
     table = AsciiTable(table_data, title=title)
     print(table.table)

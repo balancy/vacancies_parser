@@ -115,4 +115,4 @@ if __name__ == "__main__":
             calculate_salaries_for_pages(language, 1)
         statistics[language] = format_statistics(jobs_found, salaries)
 
-    show_pretty_statistics(statistics)
+    show_pretty_statistics(statistics, "HeadHunter")

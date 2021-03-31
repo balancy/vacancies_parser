@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+from terminaltables import AsciiTable
 
 
 def predict_salary(salary_from, salary_to):
@@ -40,3 +41,24 @@ def extract_popular_programming_languages(number=8):
         else len(extracted_languages)
 
     return [language.text for language in extracted_languages][:number]
+
+
+def show_pretty_statistics(statistics):
+    """Prints statistics in pretty form.
+
+    :param statistics: statistics dictionary
+    :return: None
+    """
+
+    table_data = [["Язык программирования", "Вакансий найдено",
+                   "Вакансий обработано", "Средняя зарплата"]]
+    for key, value in statistics.items():
+        table_data.append([
+            key, value.get("vacancies_found"),
+            value.get("vacancies_processed"),
+            value.get("average_salary"),
+        ])
+
+    title = "SuperJob Moscow"
+    table = AsciiTable(table_data, title=title)
+    print(table.table)

@@ -4,7 +4,9 @@ from statistics import mean
 from dotenv import load_dotenv
 import requests
 
-from utils import extract_popular_programming_languages, predict_salary
+from utils import (extract_popular_programming_languages,
+                   predict_salary,
+                   show_pretty_statistics)
 
 
 API_URL = "https://api.superjob.ru/2.33/vacancies/"
@@ -18,7 +20,6 @@ def get_response(api_key, keyword):
 
     params = {
         "town": "Москва",
-        # "catalogues": 48,
         "keyword": keyword,
     }
 
@@ -68,9 +69,9 @@ if __name__ == "__main__":
     api_key = os.environ["SECRET_KEY"]
 
     statistics = dict()
-    languages = extract_popular_programming_languages(3)
+    languages = extract_popular_programming_languages()
     for language in languages:
         response = get_response(api_key, language)
         statistics[language] = format_statistics(response)
 
-    print(statistics)
+    show_pretty_statistics(statistics)

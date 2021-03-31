@@ -1,9 +1,10 @@
 from statistics import mean
-import time
 
 import requests
 
-from utils import extract_popular_programming_languages, predict_salary
+from utils import (extract_popular_programming_languages,
+                   predict_salary,
+                   show_pretty_statistics)
 
 API_URL = "https://api.hh.ru/vacancies"
 
@@ -87,7 +88,6 @@ def calculate_salaries_for_pages(job_title, number_of_pages=30):
         if not response_items:
             break
         salaries += calculate_predicted_salaries(response_items)
-        time.sleep(3)
 
     return salaries, results_found
 
@@ -108,11 +108,11 @@ def format_statistics(jobs_found, salaries):
 
 
 if __name__ == "__main__":
-    languages = extract_popular_programming_languages(2)
-    output = dict()
+    languages = extract_popular_programming_languages(4)
+    statistics = dict()
     for language in languages:
         salaries, jobs_found = \
-            calculate_salaries_for_pages(f"Программист {language}", 3)
-        output[language] = format_statistics(jobs_found, salaries)
+            calculate_salaries_for_pages(language, 1)
+        statistics[language] = format_statistics(jobs_found, salaries)
 
-    print(output)
+    show_pretty_statistics(statistics)

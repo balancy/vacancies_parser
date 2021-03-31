@@ -44,6 +44,25 @@ def predict_rub_salary_sj(vacancy_description):
     return predict_salary(salary_from, salary_to)
 
 
+def format_statistics(parsed_response):
+    """Represent statistics about jobs in the form of dictionary.
+
+    :param parsed_response: parsed HTTP response
+    :return: statistics in the form of dictionary
+    """
+
+    predicted_salaries = [predict_rub_salary_sj(vacancy) for vacancy in
+                          parsed_response.get("objects")]
+    not_none_salaries = [salary for salary in predicted_salaries if
+                         salary is not None]
+
+    return {
+        "vacancies_found": response.get("total"),
+        "vacancies_processed": len(not_none_salaries),
+        "average_salary": int(mean(not_none_salaries)),
+    }
+
+
 if __name__ == "__main__":
     load_dotenv()
     api_key = os.environ["SECRET_KEY"]
@@ -52,16 +71,6 @@ if __name__ == "__main__":
     languages = extract_popular_programming_languages(3)
     for language in languages:
         response = get_response(api_key, language)
-        predicted_salaries = [predict_rub_salary_sj(vacancy) for vacancy in
-                              response.get("objects")]
-        not_none_salaries = [predicted_salary for predicted_salary in
-                             predicted_salaries if
-                             predicted_salary is not None]
-
-        statistics[language] = {
-            "vacancies_found": response.get("total"),
-            "vacancies_processed": len(not_none_salaries),
-            "average_salary": int(mean(not_none_salaries)),
-        }
+        statistics[language] = format_statistics(response)
 
     print(statistics)

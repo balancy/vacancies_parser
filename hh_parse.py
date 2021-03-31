@@ -1,32 +1,11 @@
 from statistics import mean
 import time
 
-from bs4 import BeautifulSoup
 import requests
 
+from utils import extract_popular_programming_languages, predict_salary
+
 API_URL = "https://api.hh.ru/vacancies"
-
-
-def extract_popular_programming_languages(number=8):
-    """Extract a list of popular programming languages.
-
-    :param number: number of languages
-    :return: list of languages
-    """
-
-    url = "https://www.codingame.com/work/blog/hr-news-trends/" \
-          "top-10-in-demand-programming-languages/"
-    response = requests.get(url)
-    response.raise_for_status()
-
-    soup = BeautifulSoup(response.content, "lxml")
-    selector = "ol li strong"
-
-    extracted_languages = soup.select(selector)
-    number = number if 1 <= number < len(extracted_languages) \
-        else len(extracted_languages)
-
-    return [language.text for language in extracted_languages][:number]
 
 
 def fetch_hh_page(job_title, page_number):
@@ -51,7 +30,7 @@ def fetch_hh_page(job_title, page_number):
     return response.json()
 
 
-def predict_rub_salary(salary_fork):
+def predict_rub_salary_hh(salary_fork):
     """Predict salary in rubles given a salary fork.
 
     :param salary_fork: salary fork
@@ -64,14 +43,7 @@ def predict_rub_salary(salary_fork):
     salary_from = salary_fork.get("from")
     salary_to = salary_fork.get("to")
 
-    if salary_from and salary_to:
-        return (salary_from + salary_to) / 2
-    if salary_from:
-        return salary_from * 1.2
-    if salary_to:
-        return salary_to * 0.8
-
-    return None
+    return predict_salary(salary_from, salary_to)
 
 
 def calculate_predicted_salaries(response_items):
@@ -82,7 +54,7 @@ def calculate_predicted_salaries(response_items):
     """
 
     salaries_forks = [vacancy.get("salary") for vacancy in response_items]
-    salaries = [predict_rub_salary(salary_fork)
+    salaries = [predict_rub_salary_hh(salary_fork)
                 for salary_fork in salaries_forks if salary_fork]
 
     return salaries

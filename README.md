@@ -32,7 +32,7 @@ pip install -r requirements.txt
 ```
 5. Rename file `.env.example` to `.env` and initialize your propre SuperJob API key:
 ```console
-SECRET_KEY = "v3.r.111111111.1111111111111111111111111111.111111111111111111111111111111"
+SECRET_KEY="v3.r.111111111.1111111111111111111111111111.111111111111111111111111111111"
 ```
 6. Run HH and SuperJob parsing scripts by commands:
 ```console

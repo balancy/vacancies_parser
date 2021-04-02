@@ -53,11 +53,11 @@ def show_pretty_statistics(statistics, site):
 
     table_data = [["Язык программирования", "Вакансий найдено",
                    "Вакансий обработано", "Средняя зарплата"]]
-    for key, value in statistics.items():
+    for language, vacancies_stats in statistics.items():
         table_data.append([
-            key, value.get("vacancies_found"),
-            value.get("vacancies_processed"),
-            value.get("average_salary"),
+            language, vacancies_stats.get("vacancies_found"),
+            vacancies_stats.get("vacancies_processed"),
+            vacancies_stats.get("average_salary"),
         ])
 
     title = f"{site} Moscow"

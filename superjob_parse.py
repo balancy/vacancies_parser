@@ -60,8 +60,7 @@ def format_statistics(parsed_response):
 
     predicted_salaries = [predict_rub_salary_sj(vacancy) for vacancy in
                           parsed_response.get("objects")]
-    not_none_salaries = [salary for salary in predicted_salaries if
-                         salary is not None]
+    not_none_salaries = list(filter(None, predicted_salaries))
 
     return {
         "vacancies_found": response.get("total"),

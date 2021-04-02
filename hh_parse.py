@@ -64,7 +64,7 @@ def calculate_predicted_salaries(response_items):
     predicted_salaries = [predict_rub_salary_hh(salary_fork)
                           for salary_fork in salaries_forks]
 
-    return [salary for salary in predicted_salaries if salary is not None]
+    return list(filter(None, predicted_salaries))
 
 
 def gather_statistics_from_site(job_title, number_of_pages=30):

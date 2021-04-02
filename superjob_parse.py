@@ -72,13 +72,13 @@ def format_statistics(parsed_response):
 
 if __name__ == "__main__":
     load_dotenv()
-    api_key = os.environ["SECRET_KEY"]
+    superjob_api_key = os.environ["SECRET_KEY"]
 
     statistics = dict()
     languages = extract_popular_programming_languages()
     for language in languages:
         try:
-            response = get_response(api_key, language)
+            response = get_response(superjob_api_key, language)
         except requests.HTTPError:
             print("SuperJob API is unavailable. Try later.")
             break

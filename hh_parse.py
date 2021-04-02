@@ -7,6 +7,7 @@ from utils import (extract_popular_programming_languages,
                    generate_pretty_statistics)
 
 API_URL = "https://api.hh.ru/vacancies"
+MOSCOW_AREA_CODE = 1
 
 
 def fetch_hh_page(job_title, page_number):
@@ -19,7 +20,7 @@ def fetch_hh_page(job_title, page_number):
 
     params = {
         "text": f"NAME:{job_title}",
-        "area": "1",
+        "area": MOSCOW_AREA_CODE,
         "period": "30",
         "page": str(page_number),
         "per_page": "100",
@@ -38,7 +39,9 @@ def predict_rub_salary_hh(salary_fork):
     :return: predicted salary
     """
 
-    if not salary_fork.get("currency") != "RUB":
+    if salary_fork is None:
+        return None
+    if salary_fork.get("currency") != "RUR":
         return None
 
     salary_from = salary_fork.get("from")
@@ -55,10 +58,11 @@ def calculate_predicted_salaries(response_items):
     """
 
     salaries_forks = [vacancy.get("salary") for vacancy in response_items]
-    salaries = [predict_rub_salary_hh(salary_fork)
-                for salary_fork in salaries_forks if salary_fork]
 
-    return salaries
+    predicted_salaries = [predict_rub_salary_hh(salary_fork)
+                          for salary_fork in salaries_forks]
+
+    return [salary for salary in predicted_salaries if salary is not None]
 
 
 def calculate_salaries_for_pages(job_title, number_of_pages=30):

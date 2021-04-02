@@ -1,3 +1,4 @@
+from collections import Counter
 import os
 from statistics import mean
 
@@ -12,11 +13,12 @@ from utils import (extract_popular_programming_languages,
 API_URL = "https://api.superjob.ru/2.33/vacancies/"
 
 
-def get_response(api_key, keyword):
+def get_response(api_key, keyword, page_number):
     """Get HTTP response from SuperJob API, using keyword.
 
     :param api_key: your API key
     :param keyword: job to search. Example: Python
+    :param page_number: number of page
     :return: HTTP response
     """
 
@@ -27,6 +29,8 @@ def get_response(api_key, keyword):
     params = {
         "town": "Москва",
         "keyword": keyword,
+        "page": page_number,
+        "count": 100,
     }
 
     response = requests.get(API_URL, headers=headers, params=params)
@@ -51,21 +55,31 @@ def predict_rub_salary_sj(vacancy_description):
     return predict_salary(salary_from, salary_to)
 
 
-def format_statistics(parsed_response):
-    """Represent statistics about jobs in the form of dictionary.
+def calculate_predicted_salaries(parsed_response):
+    """Calculate predicted salaries for all salaries found in parsed response.
 
     :param parsed_response: parsed HTTP response
+    :return: predicted salaries
+    """
+
+    predicted_salaries = [predict_rub_salary_sj(vacancy) for vacancy
+                          in parsed_response.get("objects")]
+
+    return list(filter(None, predicted_salaries))
+
+
+def format_statistics(total, salaries):
+    """Represent statistics about jobs in the form of dictionary.
+
+    :param total: total number of results
+    :param salaries: calculated predicted salaries
     :return: statistics in the form of dictionary
     """
 
-    predicted_salaries = [predict_rub_salary_sj(vacancy) for vacancy in
-                          parsed_response.get("objects")]
-    not_none_salaries = list(filter(None, predicted_salaries))
-
     return {
-        "vacancies_found": response.get("total"),
-        "vacancies_processed": len(not_none_salaries),
-        "average_salary": int(mean(not_none_salaries)),
+        "vacancies_found": total,
+        "vacancies_processed": len(salaries),
+        "average_salary": int(mean(salaries)),
     }
 
 
@@ -75,13 +89,24 @@ if __name__ == "__main__":
 
     statistics = dict()
     languages = extract_popular_programming_languages()
-    for language in languages:
-        try:
-            response = get_response(superjob_api_key, language)
-        except requests.HTTPError:
-            print("SuperJob API is unavailable. Try later.")
-            break
-        statistics[language] = format_statistics(response)
+    for language in languages[1:]:
+        predicted_salaries = list()
+        look_another_page = True
+        page_number = 0
+
+        while look_another_page:
+            try:
+                response = get_response(superjob_api_key, language, page_number)
+            except requests.HTTPError:
+                print("SuperJob API is unavailable. Try later.")
+                continue
+
+            look_another_page = response.get("more")
+            predicted_salaries += calculate_predicted_salaries(response)
+            total = response.get("total")
+            page_number += 1
+
+        statistics[language] = format_statistics(total, predicted_salaries)
 
     table = generate_pretty_statistics(statistics, "SuperJob")
     print(table)

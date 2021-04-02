@@ -117,11 +117,11 @@ if __name__ == "__main__":
                 gather_statistics_from_site(language, 1)
         except requests.HTTPError:
             print("Unable to reach the HH API. Try later.")
-            sys.exit()
+            continue
         except requests.exceptions.ConnectionError:
             print("Failed to establish a new connection "
                   "during parsing from HH API. Try later.")
-            sys.exit()
+            continue
 
         statistics[language] = format_statistics(jobs_found, salaries)
 

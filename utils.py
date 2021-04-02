@@ -43,12 +43,12 @@ def extract_popular_programming_languages(number=8):
     return [language.text for language in extracted_languages][:number]
 
 
-def show_pretty_statistics(statistics, site):
-    """Prints statistics in pretty form.
+def generate_pretty_statistics(statistics, site):
+    """Generates statistics in pretty format.
 
     :param statistics: statistics dictionary
     :param site: site statistics comes from
-    :return: None
+    :return: generated pretty statistics
     """
 
     table_data = [["Язык программирования", "Вакансий найдено",
@@ -62,4 +62,5 @@ def show_pretty_statistics(statistics, site):
 
     title = f"{site} Moscow"
     table = AsciiTable(table_data, title=title)
-    print(table.table)
+
+    return table.table

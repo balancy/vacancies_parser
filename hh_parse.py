@@ -4,7 +4,7 @@ import requests
 
 from utils import (extract_popular_programming_languages,
                    predict_salary,
-                   show_pretty_statistics)
+                   generate_pretty_statistics)
 
 API_URL = "https://api.hh.ru/vacancies"
 
@@ -115,4 +115,5 @@ if __name__ == "__main__":
             calculate_salaries_for_pages(language, 1)
         statistics[language] = format_statistics(jobs_found, salaries)
 
-    show_pretty_statistics(statistics, "HeadHunter")
+    table = generate_pretty_statistics(statistics, "HeadHunter")
+    print(table)

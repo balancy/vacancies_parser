@@ -6,7 +6,7 @@ import requests
 
 from utils import (extract_popular_programming_languages,
                    predict_salary,
-                   show_pretty_statistics)
+                   generate_pretty_statistics)
 
 
 API_URL = "https://api.superjob.ru/2.33/vacancies/"
@@ -84,4 +84,5 @@ if __name__ == "__main__":
             break
         statistics[language] = format_statistics(response)
 
-    show_pretty_statistics(statistics, "SuperJob")
+    table = generate_pretty_statistics(statistics, "SuperJob")
+    print(table)

@@ -1,3 +1,5 @@
+import sys
+
 from statistics import mean
 
 import requests
@@ -65,25 +67,19 @@ def calculate_predicted_salaries(response_items):
     return [salary for salary in predicted_salaries if salary is not None]
 
 
-def calculate_salaries_for_pages(job_title, number_of_pages=30):
-    """Calculate predicted salaries for all given pages.
+def gather_statistics_from_site(job_title, number_of_pages=30):
+    """Gather statistics such as number of vacancies found, processed and
+    average salary from site.
 
     :param job_title: job title
     :param number_of_pages: number of pages to parse
-    :return: list of calculated salaries and total number of jobs found
+    :return: gathered statistics
     """
 
     salaries = list()
     results_found = 0
     for page_number in range(number_of_pages):
-        try:
-            parsed_response = fetch_hh_page(job_title, page_number)
-        except requests.HTTPError:
-            print("Unable to reach the server")
-            break
-        except requests.exceptions.ConnectionError:
-            print("Failed to establish a new connection.")
-            break
+        parsed_response = fetch_hh_page(job_title, page_number)
 
         if not results_found:
             results_found = parsed_response.get("found")
@@ -91,6 +87,7 @@ def calculate_salaries_for_pages(job_title, number_of_pages=30):
         response_items = parsed_response.get("items")
         if not response_items:
             break
+
         salaries += calculate_predicted_salaries(response_items)
 
     return salaries, results_found
@@ -115,8 +112,17 @@ if __name__ == "__main__":
     languages = extract_popular_programming_languages(4)
     statistics = dict()
     for language in languages:
-        salaries, jobs_found = \
-            calculate_salaries_for_pages(language, 1)
+        try:
+            salaries, jobs_found = \
+                gather_statistics_from_site(language, 1)
+        except requests.HTTPError:
+            print("Unable to reach the HH API. Try later.")
+            sys.exit()
+        except requests.exceptions.ConnectionError:
+            print("Failed to establish a new connection "
+                  "during parsing from HH API. Try later.")
+            sys.exit()
+
         statistics[language] = format_statistics(jobs_found, salaries)
 
     table = generate_pretty_statistics(statistics, "HeadHunter")

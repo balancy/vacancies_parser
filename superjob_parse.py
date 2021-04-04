@@ -70,7 +70,7 @@ def calculate_predicted_salaries(parsed_response):
 
 if __name__ == "__main__":
     load_dotenv()
-    superjob_api_key = os.environ["SECRET_KEY"]
+    superjob_api_key = os.environ["SUPERJOB_API_TOKEN"]
 
     statistics = dict()
     languages = extract_popular_programming_languages()

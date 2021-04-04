@@ -1,12 +1,11 @@
-import sys
-
-from statistics import mean
-
 import requests
 
-from utils import (extract_popular_programming_languages,
-                   predict_salary,
-                   generate_pretty_statistics)
+from utils import (
+    extract_popular_programming_languages,
+    format_statistics,
+    generate_pretty_statistics,
+    predict_salary,
+)
 
 API_URL = "https://api.hh.ru/vacancies"
 MOSCOW_AREA_CODE = 1
@@ -41,7 +40,7 @@ def predict_rub_salary_hh(salary_fork):
     :return: predicted salary
     """
 
-    if salary_fork is None:
+    if not salary_fork:
         return None
     if salary_fork.get("currency") != "RUR":
         return None
@@ -91,21 +90,6 @@ def gather_statistics_from_site(job_title, number_of_pages=30):
         salaries += calculate_predicted_salaries(response_items)
 
     return salaries, results_found
-
-
-def format_statistics(jobs_found, salaries):
-    """Represent some statistics in formatted form.
-
-    :param jobs_found: number of found jobs
-    :param salaries: list of salaries
-    :return: statistics in formatted form
-    """
-
-    return {
-        "vacancies_found": jobs_found,
-        "vacancies_processed": len(salaries),
-        "average_salary": int(mean(salaries)),
-    }
 
 
 if __name__ == "__main__":

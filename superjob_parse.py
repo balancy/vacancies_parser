@@ -1,14 +1,14 @@
-from collections import Counter
 import os
-from statistics import mean
 
 from dotenv import load_dotenv
 import requests
 
-from utils import (extract_popular_programming_languages,
-                   predict_salary,
-                   generate_pretty_statistics)
-
+from utils import (
+    extract_popular_programming_languages,
+    format_statistics,
+    generate_pretty_statistics,
+    predict_salary,
+)
 
 API_URL = "https://api.superjob.ru/2.33/vacancies/"
 
@@ -68,21 +68,6 @@ def calculate_predicted_salaries(parsed_response):
     return list(filter(None, predicted_salaries))
 
 
-def format_statistics(total, salaries):
-    """Represent statistics about jobs in the form of dictionary.
-
-    :param total: total number of results
-    :param salaries: calculated predicted salaries
-    :return: statistics in the form of dictionary
-    """
-
-    return {
-        "vacancies_found": total,
-        "vacancies_processed": len(salaries),
-        "average_salary": int(mean(salaries)),
-    }
-
-
 if __name__ == "__main__":
     load_dotenv()
     superjob_api_key = os.environ["SECRET_KEY"]
@@ -99,7 +84,7 @@ if __name__ == "__main__":
                 response = get_response(superjob_api_key, language, page_number)
             except requests.HTTPError:
                 print("SuperJob API is unavailable. Try later.")
-                continue
+                break
 
             look_another_page = response.get("more")
             predicted_salaries += calculate_predicted_salaries(response)

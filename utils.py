@@ -1,3 +1,5 @@
+from statistics import mean
+
 from bs4 import BeautifulSoup
 import requests
 from terminaltables import AsciiTable
@@ -64,3 +66,18 @@ def generate_pretty_statistics(statistics, site):
     table = AsciiTable(table_data, title=title)
 
     return table.table
+
+
+def format_statistics(jobs_found, salaries):
+    """Represent some statistics in formatted form.
+
+    :param jobs_found: number of found jobs
+    :param salaries: list of salaries
+    :return: statistics in formatted form
+    """
+
+    return {
+        "vacancies_found": jobs_found,
+        "vacancies_processed": len(salaries),
+        "average_salary": int(mean(salaries)),
+    }
